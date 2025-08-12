@@ -1,0 +1,304 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Базовые стили для доступности */
+@layer base {
+  html {
+    font-size: 16px; /* Базовый размер, изменяется через JS */
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+      "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+      "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+  }
+
+  /* Фокус для доступности */
+  *:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Убираем outline для мыши, оставляем для клавиатуры */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Убеждаемся, что фокус виден при навигации с клавиатуры */
+  *:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+/* Стили для высокого контраста */
+.high-contrast {
+  filter: contrast(1.5);
+}
+
+.high-contrast * {
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.high-contrast a {
+  text-decoration: underline !important;
+}
+
+/* Темная тема */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  @apply bg-gray-900 text-white;
+}
+
+.dark .bg-white {
+  @apply bg-gray-800;
+}
+
+.dark .text-gray-900 {
+  @apply text-white;
+}
+
+.dark .text-gray-700 {
+  @apply text-gray-300;
+}
+
+.dark .text-gray-600 {
+  @apply text-gray-400;
+}
+
+.dark .border-gray-200 {
+  @apply border-gray-700;
+}
+
+.dark .border-gray-300 {
+  @apply border-gray-600;
+}
+
+.dark .bg-gray-50 {
+  @apply bg-gray-800;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-gray-700;
+}
+
+/* Анимации */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Стили для prose (контент страниц) */
+.prose {
+  @apply text-gray-700 leading-relaxed;
+}
+
+.prose h1 {
+  @apply text-3xl font-bold text-gray-900 mb-6 mt-0;
+}
+
+.prose h2 {
+  @apply text-2xl font-semibold text-gray-900 mb-4 mt-8;
+}
+
+.prose h3 {
+  @apply text-xl font-semibold text-gray-900 mb-3 mt-6;
+}
+
+.prose h4 {
+  @apply text-lg font-semibold text-gray-900 mb-2 mt-4;
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+.prose ul,
+.prose ol {
+  @apply mb-4 ml-6;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+.prose a {
+  @apply text-blue-600 hover:text-blue-800 underline;
+}
+
+.prose strong {
+  @apply font-semibold text-gray-900;
+}
+
+.prose em {
+  @apply italic;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-blue-200 pl-4 italic text-gray-600 my-4;
+}
+
+.prose img {
+  @apply max-w-full h-auto rounded-lg shadow-sm my-4;
+}
+
+/* Темная тема для prose */
+.dark .prose {
+  @apply text-gray-300;
+}
+
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4 {
+  @apply text-white;
+}
+
+.dark .prose strong {
+  @apply text-white;
+}
+
+.dark .prose blockquote {
+  @apply border-blue-400 text-gray-400;
+}
+
+/* Улучшения для мобильных устройств */
+@media (max-width: 640px) {
+  .prose h1 {
+    @apply text-2xl;
+  }
+
+  .prose h2 {
+    @apply text-xl;
+  }
+
+  .prose h3 {
+    @apply text-lg;
+  }
+}
+
+/* Стили для скринридеров */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Показать элементы при фокусе (полезно для skip-links) */
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  @apply bg-blue-600 text-white z-50;
+}
+
+/* Стили для улучшения читаемости */
+.text-readable {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  letter-spacing: 0.025em;
+}
+
+/* Стили для кнопок с улучшенной доступностью */
+.btn-accessible {
+  @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  min-height: 44px; /* Минимальный размер для touch */
+  min-width: 44px;
+}
+
+.btn-primary {
+  @apply btn-accessible bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+}
+
+.btn-secondary {
+  @apply btn-accessible bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+}
+
+/* Улучшения для высокого DPI */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .prose img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+  }
+}
+
+/* Медиа-запросы для уменьшения анимаций */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Медиа-запросы для высокого контраста */
+@media (prefers-contrast: high) {
+  .high-contrast {
+    filter: contrast(2);
+  }
+}
