@@ -18,10 +18,10 @@ class SpecialistContent extends Model
     protected $table = 'specialist_content';
 
     /**
-     * Типы контента
+     * ОБНОВЛЕНО: Типы контента
      */
-    const TYPE_DOCUMENTS = 'documents';
-    const TYPE_INSTRUCTIONS = 'instructions';
+    const TYPE_LEGISLATION = 'legislation';
+    const TYPE_INFORMATION = 'information';
 
     /**
      * The attributes that are mass assignable.
@@ -90,31 +90,31 @@ class SpecialistContent extends Model
     }
 
     /**
-     * Получить все возможные типы контента
+     * ОБНОВЛЕНО: Получить все возможные типы контента
      */
     public static function getAllTypes(): array
     {
         return [
-            self::TYPE_DOCUMENTS,
-            self::TYPE_INSTRUCTIONS,
+            self::TYPE_LEGISLATION,
+            self::TYPE_INFORMATION,
         ];
     }
 
     /**
-     * Получить переводы типов контента
+     * ОБНОВЛЕНО: Получить переводы типов контента
      */
     public static function getTypeTranslations(): array
     {
         return [
-            self::TYPE_DOCUMENTS => [
-                'ru' => 'Документы',
-                'be' => 'Дакументы', 
-                'en' => 'Documents'
+            self::TYPE_LEGISLATION => [
+                'ru' => 'Законодательство',
+                'be' => 'Заканадаўства', 
+                'en' => 'Legislation'
             ],
-            self::TYPE_INSTRUCTIONS => [
-                'ru' => 'Инструкции',
-                'be' => 'Інструкцыі',
-                'en' => 'Instructions'
+            self::TYPE_INFORMATION => [
+                'ru' => 'Информация',
+                'be' => 'Інфармацыя',
+                'en' => 'Information'
             ],
         ];
     }
@@ -151,6 +151,22 @@ class SpecialistContent extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
+    }
+
+    /**
+     * ДОБАВЛЕНО: Скоуп для законодательства
+     */
+    public function scopeLegislation($query)
+    {
+        return $query->where('content_type', self::TYPE_LEGISLATION);
+    }
+
+    /**
+     * ДОБАВЛЕНО: Скоуп для информации
+     */
+    public function scopeInformation($query)
+    {
+        return $query->where('content_type', self::TYPE_INFORMATION);
     }
 
     /**

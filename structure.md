@@ -2,8 +2,6 @@
 ugond.loc
 ├─ backend
 │  ├─ .editorconfig
-│  ├─ .env
-│  ├─ .env.example
 │  ├─ app
 │  │  ├─ Http
 │  │  │  ├─ Controllers
@@ -13,29 +11,36 @@ ugond.loc
 │  │  │  │  │  ├─ AuthController.php
 │  │  │  │  │  ├─ PageController.php
 │  │  │  │  │  ├─ SpecialistController.php
+│  │  │  │  │  ├─ SpecialistFileController.php
 │  │  │  │  │  └─ TestRolesController.php
 │  │  │  │  └─ Controller.php
 │  │  │  ├─ Middleware
 │  │  │  │  ├─ AdminMiddleware.php
 │  │  │  │  └─ SpecialistMiddleware.php
-│  │  │  └─ Requests
-│  │  │     ├─ ChangePasswordRequest.php
-│  │  │     ├─ RegisterSpecialistRequest.php
-│  │  │     └─ UpdateProfileRequest.php
+│  │  │  ├─ Requests
+│  │  │  │  ├─ ChangePasswordRequest.php
+│  │  │  │  ├─ RegisterSpecialistRequest.php
+│  │  │  │  └─ UpdateProfileRequest.php
+│  │  │  └─ Resources
+│  │  │     ├─ SpecialistContentResource.php
+│  │  │     └─ SpecialistFileResource.php
 │  │  ├─ Models
 │  │  │  ├─ IdentificationNumber.php
 │  │  │  ├─ Page.php
 │  │  │  ├─ SpecialistContent.php
 │  │  │  ├─ SpecialistFile.php
 │  │  │  └─ User.php
-│  │  └─ Providers
-│  │     └─ AppServiceProvider.php
+│  │  ├─ Providers
+│  │  │  └─ AppServiceProvider.php
+│  │  └─ Services
+│  │     ├─ Contracts
+│  │     │  ├─ SpecialistContentServiceInterface.php
+│  │     │  └─ SpecialistFileServiceInterface.php
+│  │     ├─ SpecialistContentService.php
+│  │     └─ SpecialistFileService.php
 │  ├─ artisan
 │  ├─ bootstrap
 │  │  ├─ app.php
-│  │  ├─ cache
-│  │  │  ├─ packages.php
-│  │  │  └─ services.php
 │  │  └─ providers.php
 │  ├─ composer.json
 │  ├─ composer.lock
@@ -53,7 +58,6 @@ ugond.loc
 │  │  ├─ services.php
 │  │  └─ session.php
 │  ├─ database
-│  │  ├─ database.sqlite
 │  │  ├─ factories
 │  │  │  └─ UserFactory.php
 │  │  ├─ migrations
@@ -62,7 +66,8 @@ ugond.loc
 │  │  │  ├─ 2025_08_10_135920_create_users_table.php
 │  │  │  ├─ 2025_08_10_172243_create_specialist_content_table.php
 │  │  │  ├─ 2025_08_10_172331_create_specialist_files_table.php
-│  │  │  └─ 2025_08_11_140845_create_identification_numbers_table.php
+│  │  │  ├─ 2025_08_11_140845_create_identification_numbers_table.php
+│  │  │  └─ 2025_08_12_120910_update_specialist_content_types.php
 │  │  └─ seeders
 │  │     ├─ DatabaseSeeder.php
 │  │     ├─ IdentificationNumbersSeeder.php
@@ -93,16 +98,8 @@ ugond.loc
 │  │  ├─ app
 │  │  │  ├─ private
 │  │  │  └─ public
-│  │  ├─ framework
-│  │  │  ├─ cache
-│  │  │  │  └─ data
-│  │  │  ├─ sessions
-│  │  │  │  ├─ 8d0UMLiwPZYbhUYG63NlCfQhW5ptdpUHnYlGp5CM
-│  │  │  │  └─ P8IBhkC9FJXhHhv5SeVPQ33kxrPZSSaIT5Use9sO
-│  │  │  ├─ testing
-│  │  │  └─ views
-│  │  └─ logs
-│  │     └─ laravel.log
+│  │  └─ framework
+│  │     └─ cache
 │  ├─ tests
 │  │  ├─ Feature
 │  │  │  └─ ExampleTest.php
@@ -114,7 +111,11 @@ ugond.loc
 │  ├─ mvp-readme.md
 │  ├─ setup-commands.md
 │  ├─ step2-documentation.md
-│  └─ команды для работы с миграциями laravel.md
+│  ├─ команды для работы с миграциями laravel.md
+│  ├─ план реализации шага 2.md
+│  ├─ промпт для шага 2.1.5.txt
+│  ├─ техническая документация.md
+│  └─ шпаргалка по архитектуре.md
 ├─ frontend
 │  ├─ eslint.config.js
 │  ├─ index.html
@@ -146,6 +147,7 @@ ugond.loc
 │  │  ├─ entities
 │  │  │  └─ user
 │  │  │     ├─ api
+│  │  │     │  ├─ documentsApi.js
 │  │  │     │  └─ profileApi.js
 │  │  │     └─ model
 │  │  │        ├─ store.js
@@ -157,6 +159,16 @@ ugond.loc
 │  │  │  ├─ auth-register-specialist
 │  │  │  │  └─ ui
 │  │  │  │     └─ RegisterSpecialistForm.jsx
+│  │  │  ├─ document-viewer
+│  │  │  │  ├─ hooks
+│  │  │  │  │  └─ useSpecialistContent.js
+│  │  │  │  ├─ index.js
+│  │  │  │  └─ ui
+│  │  │  │     └─ DocumentViewer.jsx
+│  │  │  ├─ file-download
+│  │  │  │  ├─ index.js
+│  │  │  │  └─ ui
+│  │  │  │     └─ FileDownload.jsx
 │  │  │  ├─ password-change
 │  │  │  │  ├─ index.js
 │  │  │  │  └─ ui
@@ -177,6 +189,8 @@ ugond.loc
 │  │  │  │  └─ AdminDashboard.jsx
 │  │  │  ├─ DynamicPage.jsx
 │  │  │  ├─ HomePage.jsx
+│  │  │  ├─ InformationPage.jsx
+│  │  │  ├─ LegislationPage.jsx
 │  │  │  ├─ LoginPage.jsx
 │  │  │  ├─ NotFoundPage.jsx
 │  │  │  ├─ ProfilePage.jsx
@@ -195,13 +209,21 @@ ugond.loc
 │  │  │     │  └─ Input.jsx
 │  │  │     ├─ Modal
 │  │  │     │  └─ Modal.jsx
-│  │  │     └─ ProtectedRoute
-│  │  │        └─ ProtectedRoute.jsx
+│  │  │     ├─ ProtectedRoute
+│  │  │     │  └─ ProtectedRoute.jsx
+│  │  │     ├─ QuickDocumentLinks
+│  │  │     │  ├─ index.js
+│  │  │     │  └─ QuickDocumentLinks.jsx
+│  │  │     └─ SpecialistContentPage
+│  │  │        ├─ index.js
+│  │  │        └─ SpecialistContentPage.jsx
 │  │  └─ widgets
 │  │     └─ profile-dashboard
 │  │        ├─ index.js
 │  │        └─ ProfileDashboard.jsx
 │  ├─ tailwind.config.js
 │  └─ vite.config.js
-└─ structure.md
+├─ structure.md
+├─ исправления.txt
+└─ Текстовый документ.txt
 ```

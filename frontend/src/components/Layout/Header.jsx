@@ -1,7 +1,17 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Menu, X, Eye, LogIn, LogOut, User, Settings } from "lucide-react";
+import {
+  Menu,
+  X,
+  Eye,
+  LogIn,
+  LogOut,
+  User,
+  Settings,
+  Scale,
+  BookOpen,
+} from "lucide-react";
 import LanguageSwitcher from "../LanguageSwitcher";
 import Navigation from "./Navigation";
 import AccessibilityPanel from "../AccessibilityPanel";
@@ -114,14 +124,35 @@ const Header = () => {
 
                       {/* Ссылки меню */}
                       {userHelpers.canAccessProfile(user) && (
-                        <Link
-                          to="/profile"
-                          className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <User className="h-4 w-4" />
-                          <span>Личный кабинет</span>
-                        </Link>
+                        <>
+                          <Link
+                            to="/profile"
+                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <User className="h-4 w-4" />
+                            <span>Личный кабинет</span>
+                          </Link>
+
+                          {/* ДОБАВЛЕНО: Ссылки на дополнительные страницы */}
+                          <Link
+                            to="/profile/legislation"
+                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <Scale className="h-4 w-4" />
+                            <span>Законодательство</span>
+                          </Link>
+
+                          <Link
+                            to="/profile/information"
+                            className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <BookOpen className="h-4 w-4" />
+                            <span>Информация</span>
+                          </Link>
+                        </>
                       )}
 
                       {userHelpers.canAccessAdmin(user) && (

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { User, Settings, Shield, Activity, Home, Bell } from "lucide-react";
+import { User, Settings } from "lucide-react";
 
 import Button from "../shared/ui/Button/Button";
 import Alert from "../shared/ui/Alert/Alert";
 import Modal from "../shared/ui/Modal/Modal";
+import QuickDocumentLinks from "../shared/ui/QuickDocumentLinks/QuickDocumentLinks";
 import {
   useAuthActions,
   useProfile,
@@ -11,7 +12,6 @@ import {
   useIsSpecialist,
   useUser,
 } from "../entities/user/model/store";
-import { useDocumentHead } from "../hooks/useDocumentHead";
 
 // Компоненты для личного кабинета
 import ProfileDashboard from "../widgets/profile-dashboard/ProfileDashboard";
@@ -19,8 +19,8 @@ import ProfileEditForm from "../features/profile-edit/ui/ProfileEditForm";
 import PasswordChangeForm from "../features/password-change/ui/PasswordChangeForm";
 
 /**
- * Страница личного кабинета специалиста
- * Интегрирует все функции управления профилем
+ * УПРОЩЕННАЯ страница личного кабинета специалиста
+ * Убраны табы, добавлены прямые ссылки на документы
  */
 const ProfilePage = () => {
   const authActions = useAuthActions();
@@ -29,18 +29,17 @@ const ProfilePage = () => {
   const isSpecialist = useIsSpecialist();
   const user = useUser();
 
-  // Состояние интерфейса
-  const [activeTab, setActiveTab] = useState("dashboard");
+  // Состояние модальных окон
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // SEO
-  useDocumentHead({
-    title: `Личный кабинет - ${user?.full_name || "Специалист"}`,
-    description:
-      "Управление профилем и персональными данными специалиста медицинского центра UGOND",
-  });
+  // Устанавливаем заголовок страницы (React 19 way)
+  useEffect(() => {
+    document.title = `Личный кабинет - ${
+      user?.full_name || "Специалист"
+    } - Медицинский центр`;
+  }, [user?.full_name]);
 
   // Загружаем профиль при монтировании
   useEffect(() => {
@@ -61,48 +60,6 @@ const ProfilePage = () => {
     setIsPasswordModalOpen(false);
     setTimeout(() => setSuccessMessage(""), 5000);
   };
-
-  // Конфигурация табов
-  const tabs = [
-    {
-      id: "dashboard",
-      label: "Обзор",
-      icon: Home,
-      component: (
-        <ProfileDashboard
-          onEditProfile={() => setIsEditModalOpen(true)}
-          onChangePassword={() => setIsPasswordModalOpen(true)}
-        />
-      ),
-    },
-    {
-      id: "activity",
-      label: "Активность",
-      icon: Activity,
-      component: (
-        <div className="bg-white rounded-lg border p-6">
-          <h3 className="text-lg font-semibold mb-4">Подробная активность</h3>
-          <p className="text-gray-600">
-            Детальная информация об активности будет добавлена в следующих
-            версиях.
-          </p>
-        </div>
-      ),
-    },
-    {
-      id: "settings",
-      label: "Настройки",
-      icon: Settings,
-      component: (
-        <div className="bg-white rounded-lg border p-6">
-          <h3 className="text-lg font-semibold mb-4">Настройки аккаунта</h3>
-          <p className="text-gray-600">
-            Дополнительные настройки будут доступны в следующих версиях.
-          </p>
-        </div>
-      ),
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -158,46 +115,55 @@ const ProfilePage = () => {
           </div>
         ) : (
           <>
-            {/* Заголовок и навигация */}
-            <div className="bg-white rounded-lg border mb-6">
-              <div className="px-6 py-4">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Личный кабинет
-                </h1>
-                <p className="mt-1 text-sm text-gray-600">
-                  Управляйте своим профилем и настройками
-                </p>
-              </div>
+            {/* УПРОЩЕННЫЙ заголовок без табов */}
+            <div className="bg-white rounded-lg border mb-6 p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    Личный кабинет
+                  </h1>
+                  <p className="mt-1 text-sm text-gray-600">
+                    Управляйте своим профилем и получайте доступ к документам
+                  </p>
+                </div>
 
-              {/* Табы */}
-              <div className="border-t border-gray-200">
-                <nav className="flex space-x-8 px-6" aria-label="Tabs">
-                  {tabs.map((tab) => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                          isActive
-                            ? "border-blue-500 text-blue-600"
-                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5 mr-2" />
-                        {tab.label}
-                      </button>
-                    );
-                  })}
-                </nav>
+                {/* Быстрые действия */}
+                <div className="mt-4 md:mt-0 flex flex-col sm:flex-row gap-2">
+                  <Button
+                    variant="outline"
+                    size="small"
+                    leftIcon={<User className="h-4 w-4" />}
+                    onClick={() => setIsEditModalOpen(true)}
+                  >
+                    Редактировать
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="small"
+                    leftIcon={<Settings className="h-4 w-4" />}
+                    onClick={() => setIsPasswordModalOpen(true)}
+                  >
+                    Сменить пароль
+                  </Button>
+                </div>
               </div>
             </div>
 
-            {/* Контент таба */}
-            <div className="pb-8">
-              {tabs.find((tab) => tab.id === activeTab)?.component}
+            {/* Основная панель управления */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              <div className="lg:col-span-2">
+                <ProfileDashboard
+                  onEditProfile={() => setIsEditModalOpen(true)}
+                  onChangePassword={() => setIsPasswordModalOpen(true)}
+                />
+              </div>
+
+              {/* Быстрые ссылки на документы */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg border p-6">
+                  <QuickDocumentLinks />
+                </div>
+              </div>
             </div>
           </>
         )}

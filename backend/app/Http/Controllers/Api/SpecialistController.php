@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\ChangePasswordRequest;
+use App\Services\Contracts\SpecialistContentServiceInterface;
+use App\Models\SpecialistContent;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +15,14 @@ use Illuminate\Support\Facades\DB;
 class SpecialistController extends Controller
 {
     /**
-     * ОБНОВЛЕНО: Получить профиль текущего специалиста
+     * Конструктор с внедрением зависимостей
+     */
+    public function __construct(
+        private SpecialistContentServiceInterface $contentService
+    ) {}
+
+    /**
+     * Получить профиль текущего специалиста
      */
     public function profile(Request $request): JsonResponse
     {
@@ -27,21 +36,14 @@ class SpecialistController extends Controller
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
                     'full_name' => $user->full_name,
-                    'hospital_name' => $user->hospital_name, // ДОБАВЛЕНО
+                    'hospital_name' => $user->hospital_name,
                     'email' => $user->email,
                     'role' => $user->role,
                     'created_at' => $user->created_at,
                     'last_login_at' => $user->last_login_at,
                     'email_verified_at' => $user->email_verified_at,
                 ],
-                'statistics' => [
-                    'content_pages' => $user->specialistContent()->count(),
-                    'total_files' => $user->specialistContent()
-                        ->withCount('files')
-                        ->get()
-                        ->sum('files_count'),
-                    'profile_completion' => $this->calculateProfileCompletion($user),
-                ]
+                'statistics' => $this->contentService->getContentStats($user)
             ]
         ]);
     }
@@ -73,7 +75,7 @@ class SpecialistController extends Controller
                         'first_name' => $user->first_name,
                         'last_name' => $user->last_name,
                         'full_name' => $user->full_name,
-                        'hospital_name' => $user->hospital_name, // ДОБАВЛЕНО
+                        'hospital_name' => $user->hospital_name,
                         'email' => $user->email,
                         'role' => $user->role,
                     ]
@@ -127,6 +129,61 @@ class SpecialistController extends Controller
     }
 
     /**
+     * УНИФИЦИРОВАННЫЙ: Получить контент специалиста по типу
+     * Заменяет getLegislationContent() и getInformationContent()
+     */
+    public function getContent(Request $request, string $type): JsonResponse
+    {
+        $user = $request->user();
+
+        // Валидация типа контента
+        if (!in_array($type, SpecialistContent::getAllTypes())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Недопустимый тип контента'
+            ], 400);
+        }
+
+        try {
+            $data = $this->contentService->getContentByType($user, $type);
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при получении контента: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Получить весь контент специалиста
+     */
+    public function getAllContent(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        try {
+            $data = $this->contentService->getAllContent($user);
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при получении контента: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Получить активность специалиста
      */
     public function activity(Request $request): JsonResponse
@@ -136,7 +193,7 @@ class SpecialistController extends Controller
         $activity = [
             'recent_login' => $user->last_login_at,
             'registration_date' => $user->created_at,
-            'hospital_name' => $user->hospital_name, // ДОБАВЛЕНО
+            'hospital_name' => $user->hospital_name,
             'content_updates' => $user->specialistContent()
                 ->orderBy('updated_at', 'desc')
                 ->limit(5)
@@ -144,8 +201,9 @@ class SpecialistController extends Controller
                 ->map(function ($content) {
                     return [
                         'type' => $content->content_type,
+                        'type_name' => $content->type_name,
                         'updated_at' => $content->updated_at,
-                        'title' => $content->title['ru'] ?? 'Без названия'
+                        'title' => $content->getTranslation('title', app()->getLocale()) ?? 'Без названия'
                     ];
                 }),
             'total_content' => $user->specialistContent()->count(),
@@ -166,11 +224,11 @@ class SpecialistController extends Controller
 
         $settings = [
             'notifications' => [
-                'email_updates' => true, // Можно добавить поле в БД
+                'email_updates' => true,
                 'security_alerts' => true,
             ],
             'privacy' => [
-                'profile_visibility' => 'internal', // internal, public, private
+                'profile_visibility' => 'internal',
                 'contact_visibility' => 'internal',
             ],
             'preferences' => [
@@ -199,33 +257,10 @@ class SpecialistController extends Controller
             'preferences.timezone' => 'string',
         ]);
 
-        // Здесь можно сохранить настройки в БД
-        // Пока возвращаем успешный ответ
-
         return response()->json([
             'success' => true,
             'message' => 'Настройки успешно обновлены',
             'data' => $request->all()
         ]);
-    }
-
-    /**
-     * ОБНОВЛЕНО: Вычислить процент заполнения профиля
-     */
-    private function calculateProfileCompletion($user): int
-    {
-        $fields = [
-            'first_name' => !empty($user->first_name),
-            'last_name' => !empty($user->last_name),
-            'hospital_name' => !empty($user->hospital_name), // ДОБАВЛЕНО
-            'email' => !empty($user->email),
-            'email_verified' => !is_null($user->email_verified_at),
-        ];
-
-        $completedFields = array_filter($fields);
-        $totalFields = count($fields);
-        $completedCount = count($completedFields);
-
-        return round(($completedCount / $totalFields) * 100);
     }
 }

@@ -28,11 +28,12 @@ class User extends Authenticatable
     protected $fillable = [
         'first_name',
         'last_name',
-        'hospital_name', // ДОБАВЛЕНО: Название ЦРБ
+        'hospital_name',
         'email',
         'password',
         'role',
         'is_active',
+        'last_login_at',
     ];
 
     /**
@@ -206,7 +207,7 @@ class User extends Authenticatable
     }
 
     /**
-     * ДОБАВЛЕНО: Получить список уникальных ЦРБ
+     * Получить список уникальных ЦРБ
      */
     public static function getUniqueHospitals(): array
     {

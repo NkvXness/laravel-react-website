@@ -18,6 +18,8 @@ import NotFoundPage from "./pages/NotFoundPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
+import LegislationPage from "./pages/LegislationPage";
+import InformationPage from "./pages/InformationPage";
 
 // Админ-панель
 import AdminLayout from "./components/Admin/AdminLayout";
@@ -75,6 +77,23 @@ function App() {
                 element={
                   <ProtectedRoute requireSpecialist={true}>
                     <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/profile/legislation"
+                element={
+                  <ProtectedRoute requireSpecialist={true}>
+                    <LegislationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile/information"
+                element={
+                  <ProtectedRoute requireSpecialist={true}>
+                    <InformationPage />
                   </ProtectedRoute>
                 }
               />

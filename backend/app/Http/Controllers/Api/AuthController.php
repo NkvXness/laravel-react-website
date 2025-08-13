@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\IdentificationNumber;
-use App\Http\Requests\RegisterSpecialistRequest; // ДОБАВЛЕНО
+use App\Http\Requests\RegisterSpecialistRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -89,7 +89,7 @@ class AuthController extends Controller
             $user = User::create([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
-                'hospital_name' => $request->hospital_name, // ДОБАВЛЕНО
+                'hospital_name' => $request->hospital_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => User::ROLE_SPECIALIST,
@@ -111,7 +111,7 @@ class AuthController extends Controller
                         'first_name' => $user->first_name,
                         'last_name' => $user->last_name,
                         'full_name' => $user->full_name,
-                        'hospital_name' => $user->hospital_name, // ДОБАВЛЕНО
+                        'hospital_name' => $user->hospital_name,
                         'email' => $user->email,
                         'role' => $user->role,
                         'identification_number' => $idNumber->number,
